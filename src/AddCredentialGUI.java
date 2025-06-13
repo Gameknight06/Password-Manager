@@ -1,6 +1,7 @@
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.List;
 
 public class AddCredentialGUI implements ActionListener {
 
@@ -42,7 +43,7 @@ public class AddCredentialGUI implements ActionListener {
         passwordField.setBounds(280, 100, 250, 25);
         panel.add(passwordField);
 
-        JButton encryptButton = new JButton("Encrypt");
+        JButton encryptButton = new JButton("Save");
         encryptButton.setBounds(600, 70, 80, 25);
         encryptButton.addActionListener(this);
         panel.add(encryptButton);
@@ -56,7 +57,7 @@ public class AddCredentialGUI implements ActionListener {
         panel.add(menuButton);
 
         success = new JLabel("");
-        success.setBounds(280, 10, 250, 25);
+        success.setBounds(280, 10, 320, 25);
         panel.add(success);
 
         frame.setVisible(true);
@@ -65,14 +66,17 @@ public class AddCredentialGUI implements ActionListener {
 
     @Override
     public void actionPerformed(ActionEvent e) {
+        List<String> locations = FileAccessing.readFromFile();
         String password = passwordField.getText();
         String user_email = user_emailField.getText();
         String location = locationField.getText();
 
-        if (!password.isEmpty()) {
-            Main.saveLogIn(password, location, user_email);
+        if (!password.isEmpty() && !locations.contains(location)) {
+            FileAccessing.saveLogin(password, location, user_email);
             success.setText("Successfully Encrypted and saved!");
             clearFields();
+        } else if (locations.contains(location)) {
+            success.setText("Login credentials for this location already exists!");
         } else {
             success.setText("Password field is empty!");
         }

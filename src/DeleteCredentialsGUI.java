@@ -1,8 +1,11 @@
 import javax.swing.*;
+import java.util.List;
 
 public class DeleteCredentialsGUI {
 
     private JLabel success;
+    private static List<String> locations = FileAccessing.readFromFile();
+    private static JComboBox<String> credentialList = new JComboBox<>();
 
     public DeleteCredentialsGUI() {
 
@@ -21,16 +24,17 @@ public class DeleteCredentialsGUI {
         label.setBounds(10, 40, 200, 25);
         panel.add(label);
 
-        JComboBox<String> credentialList = new JComboBox<>();
         credentialList.setBounds(10, 80, 200, 25);
+        refreshBox();
         panel.add(credentialList);
 
         JButton deleteButton = new JButton("Delete");
         deleteButton.setBounds(230, 80, 100, 25);
         deleteButton.addActionListener(e -> {
             String selected = (String) credentialList.getSelectedItem();
-
+            FileAccessing.deleteLogin(selected);
             success.setText("Deleted Credentials Successfully");
+            refreshBox();
         });
         panel.add(deleteButton);
 
@@ -43,5 +47,14 @@ public class DeleteCredentialsGUI {
         panel.add(menuButton);
 
         frame.setVisible(true);
+    }
+
+    private static void refreshBox() {
+        locations = FileAccessing.readFromFile();
+        credentialList.removeAllItems();
+
+        for (String location : locations) {
+            credentialList.addItem(location);
+        }
     }
 }
