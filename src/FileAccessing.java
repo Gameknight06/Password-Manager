@@ -39,7 +39,7 @@ public class FileAccessing {
         }
     }
 
-    public static List<String> readFromFile() {
+    public static List<String> readLocationsFromFile() {
         List<String> locations = new ArrayList<>();
 
         try {
@@ -103,12 +103,12 @@ public class FileAccessing {
                 String line2 = scanner.hasNextLine() ? scanner.nextLine() : ""; // Username/Email
                 String line3 = scanner.hasNextLine() ? scanner.nextLine() : ""; // Password
 
-                if (!line1.trim().equalsIgnoreCase("Login location: " + locationToModify.trim())) {
+                if (line1.trim().equalsIgnoreCase("Login location: " + locationToModify.trim())) {
                     String encryptedPassword = AES256.encrypt(password, secretKey, salt);
 
                     lines.add(line1);
                     lines.add(line2);
-                    lines.add("Password: " + encryptedPassword + "\n");
+                    lines.add("Password: " + encryptedPassword);
                 } else {
                     lines.add(line1);
                     lines.add(line2);
@@ -183,5 +183,25 @@ public class FileAccessing {
             e.printStackTrace();
         }
         return null;
+    }
+
+    public static String findLocation(String locationToFind) {
+        String location = "";
+
+        try {
+            Scanner scanner = new Scanner(passwordFile);
+
+            while (scanner.hasNextLine()) {
+                String line = scanner.nextLine();
+                if (line.equalsIgnoreCase("Login location: " + locationToFind.trim())) {
+                    location = line.substring("Login location: ".length()).trim();
+                }
+            }
+            scanner.close();
+        } catch (FileNotFoundException e) {
+            System.out.println("File not found");
+            e.printStackTrace();
+        }
+        return location;
     }
 }
