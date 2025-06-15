@@ -1,6 +1,9 @@
 import javax.swing.*;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
 import java.util.List;
 
 public class AddCredentialGUI implements ActionListener {
@@ -11,53 +14,102 @@ public class AddCredentialGUI implements ActionListener {
     private JLabel success;
 
     public AddCredentialGUI() {
-        JFrame frame = new JFrame();
+
+        JFrame frame = new JFrame("Add New Credentials");
         JPanel panel = new JPanel();
-        frame.setExtendedState(JFrame.MAXIMIZED_BOTH);
+        frame.setSize(700, 500);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setLocationRelativeTo(null);
+        panel.setFocusable(true);
+        SwingUtilities.invokeLater(panel::requestFocusInWindow);
+        panel.setLayout(null);
         frame.add(panel);
 
-        panel.setLayout(null);
 
-        int labelWidth = 600;
-        int labelHeight = 60;
-        int fieldWidth = 800;
-        int fieldHeight = 60;
-        int buttonWidth = 400;
-        int buttonHeight = 80;
-        int centerX = (3440 - fieldWidth) / 2;
-
-        // Label for where the password is used
-        JLabel locationLabel = new JLabel("Enter location where the password is used: ");
-        locationLabel.setBounds(centerX - 350, 400, labelWidth, labelHeight);
-        panel.add(locationLabel);
-
-        JLabel user_emailLabel = new JLabel("Enter username/email address: ");
-        user_emailLabel.setBounds(centerX - 350, 500, labelWidth, labelHeight);
-        panel.add(user_emailLabel);
-
-        JLabel passwordLabel = new JLabel("Enter Password:");
-        passwordLabel.setBounds(centerX - 350, 600, labelWidth, labelHeight);
-        panel.add(passwordLabel);
+        int fieldWidth = 300;
+        int fieldHeight = 50;
+        int buttonWidth = 150;
+        int buttonHeight = 40;
+        int centerX = (700 - fieldWidth) / 2;
 
 
-        locationField = new JTextField(20);
-        locationField.setBounds(centerX + 300, 400, fieldWidth, fieldHeight);
+        locationField = new JTextField("Location", 20);
+        locationField.setForeground(Color.GRAY);
+        locationField.setBounds(centerX, 100, fieldWidth, fieldHeight);
+        locationField.setToolTipText("Enter the location where the password is used");
+        locationField.addFocusListener(new FocusListener() {
+            @Override
+            public void focusGained(FocusEvent e) {
+                if (locationField.getText().equals("Location")) {
+                    locationField.setText("");
+                    locationField.setForeground(Color.WHITE);
+                }
+            }
+
+            @Override
+            public void focusLost(FocusEvent e) {
+                if (locationField.getText().isEmpty()) {
+                    locationField.setForeground(Color.GRAY);
+                    locationField.setText("Location");
+                }
+            }
+        });
         panel.add(locationField);
-        user_emailField = new JTextField(20);
-        user_emailField.setBounds(centerX + 300, 500, fieldWidth, fieldHeight);
+
+        user_emailField = new JTextField("Username/Email", 20);
+        user_emailField.setBounds(centerX, 170, fieldWidth, fieldHeight);
+        user_emailField.setForeground(Color.GRAY);
+        user_emailField.setToolTipText("Enter the username or email address associated with the password");
+        user_emailField.addFocusListener(new FocusListener() {
+            @Override
+            public void focusGained(FocusEvent e) {
+                if (user_emailField.getText().equals("Username/Email")) {
+                    user_emailField.setText("");
+                    user_emailField.setForeground(Color.WHITE);
+                }
+            }
+
+            @Override
+            public void focusLost(FocusEvent e) {
+                if (user_emailField.getText().isEmpty()) {
+                    user_emailField.setForeground(Color.GRAY);
+                    user_emailField.setText("Username/Email");
+                }
+            }
+        });
         panel.add(user_emailField);
-        passwordField = new JTextField(20);
-        passwordField.setBounds(centerX + 300, 600, fieldWidth, fieldHeight);
+
+        passwordField = new JTextField("Password", 20);
+        passwordField.setForeground(Color.GRAY);
+        passwordField.setBounds(centerX, 240, fieldWidth, fieldHeight);
+        passwordField.setToolTipText("Enter the password for the specified location and username/email");
+        passwordField.addFocusListener(new FocusListener() {
+            @Override
+            public void focusGained(FocusEvent e) {
+                if (passwordField.getText().equals("Password")) {
+                    passwordField.setText("");
+                    passwordField.setForeground(Color.WHITE);
+                }
+            }
+
+            @Override
+            public void focusLost(FocusEvent e) {
+                if (passwordField.getText().isEmpty()) {
+                    passwordField.setForeground(Color.GRAY);
+                    passwordField.setText("Password");
+                }
+            }
+        });
         panel.add(passwordField);
 
-        JButton encryptButton = new JButton("Save");
-        encryptButton.setBounds((3440 - buttonWidth) / 2, 800, buttonWidth, buttonHeight);
-        encryptButton.addActionListener(this);
-        panel.add(encryptButton);
+        JButton saveButton = new JButton("Save");
+        saveButton.setBounds(centerX + 70, 340, buttonWidth, buttonHeight);
+        saveButton.addActionListener(this);
+        panel.add(saveButton);
 
         JButton menuButton = new JButton("Back to Menu");
-        menuButton.setBounds(50, 50, buttonWidth, buttonHeight);
+        menuButton.putClientProperty("JButton.buttonType", "square");
+        menuButton.setBounds(10, 10, buttonWidth, buttonHeight);
         menuButton.addActionListener(e -> {
             frame.dispose();
             new MainMenuGUI();
@@ -65,7 +117,7 @@ public class AddCredentialGUI implements ActionListener {
         panel.add(menuButton);
 
         success = new JLabel("");
-        success.setBounds(centerX, 200, 1200, 60);
+        success.setBounds(centerX + 20, 50, 1200, 60);
         panel.add(success);
 
         frame.setVisible(true);

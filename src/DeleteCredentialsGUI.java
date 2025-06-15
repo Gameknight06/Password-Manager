@@ -4,42 +4,44 @@ import java.util.List;
 public class DeleteCredentialsGUI {
 
     private JLabel success;
-    private static List<String> locations = FileAccessing.readLocationsFromFile();
     private static JComboBox<String> credentialList = new JComboBox<>();
 
     public DeleteCredentialsGUI() {
 
         JFrame frame = new JFrame("Delete Credentials");
         JPanel panel = new JPanel();
-        frame.setExtendedState(JFrame.MAXIMIZED_BOTH);
+        frame.setSize(700, 500);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setLocationRelativeTo(null);
         panel.setLayout(null);
+        panel.setFocusable(true);
+        SwingUtilities.invokeLater(panel::requestFocusInWindow);
         frame.add(panel);
 
-        int labelWidth = 600;
-        int labelHeight = 60;
-        int fieldWidth = 800;
-        int fieldHeight = 60;
-        int buttonWidth = 400;
-        int buttonHeight = 80;
-        int centerX = (3440 - fieldWidth) / 2;
+        int fieldWidth = 300;
+        int fieldHeight = 50;
+        int buttonWidth = 150;
+        int buttonHeight = 50;
+        int centerX = (700 - fieldWidth) / 2;
 
         success = new JLabel("");
-        success.setBounds(centerX, 300, 1200, 60);
+        success.setBounds(centerX + 20, 70, 1200, 60);
         panel.add(success);
 
-        JLabel label = new JLabel("Select credential to delete:");
-        label.setBounds(centerX - 350, 500, labelWidth, labelHeight);
-        panel.add(label);
-
-        credentialList.setBounds(centerX + 300, 500, fieldWidth, fieldHeight);
+        credentialList.setBounds(centerX - 50, 140, fieldWidth, fieldHeight);
         refreshBox();
         panel.add(credentialList);
 
         JButton deleteButton = new JButton("Delete");
-        deleteButton.setBounds((3440 - buttonWidth) / 2, 700, buttonWidth, buttonHeight);
+        deleteButton.setBounds(centerX + 300, 140, buttonWidth, buttonHeight);
         deleteButton.addActionListener(e -> {
             String selected = (String) credentialList.getSelectedItem();
+
+            assert selected != null;
+            if(selected.equals("Select location...")) {
+                success.setText("Please select a valid location");
+                return;
+            }
             FileAccessing.deleteLogin(selected);
             success.setText("Deleted Credentials Successfully");
             refreshBox();
@@ -47,7 +49,8 @@ public class DeleteCredentialsGUI {
         panel.add(deleteButton);
 
         JButton menuButton = new JButton("Back to Menu");
-        menuButton.setBounds(50, 50, buttonWidth, buttonHeight);
+        menuButton.putClientProperty("JButton.buttonType", "square");
+        menuButton.setBounds(10, 10, buttonWidth, buttonHeight);
         menuButton.addActionListener(e -> {
             frame.dispose();
             new MainMenuGUI();
@@ -58,8 +61,9 @@ public class DeleteCredentialsGUI {
     }
 
     private static void refreshBox() {
-        locations = FileAccessing.readLocationsFromFile();
+        List<String> locations = FileAccessing.readLocationsFromFile();
         credentialList.removeAllItems();
+        locations.add(0, "Select location...");
 
         for (String location : locations) {
             credentialList.addItem(location);

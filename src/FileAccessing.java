@@ -35,7 +35,7 @@ public class FileAccessing {
             System.out.println("Password saved");
         } catch (IOException e) {
             System.out.println("Error while saving password");
-            e.printStackTrace();
+            e.printStackTrace(System.out);
         }
     }
 
@@ -55,7 +55,7 @@ public class FileAccessing {
             scanner.close();
         } catch (FileNotFoundException e) {
             System.out.println("File not found");
-            e.printStackTrace();
+            e.printStackTrace(System.out);
         }
 
         return locations;
@@ -88,7 +88,7 @@ public class FileAccessing {
             System.out.println("Entry deleted successfully");
         } catch (IOException e) {
             System.out.println("File not found");
-            e.printStackTrace();
+            e.printStackTrace(System.out);
         }
     }
 
@@ -107,7 +107,7 @@ public class FileAccessing {
                     String encryptedPassword = AES256.encrypt(password, secretKey, salt);
 
                     lines.add(line1);
-                    lines.add(line2);
+                    lines.add("Username/Email: " + username);
                     lines.add("Password: " + encryptedPassword);
                 } else {
                     lines.add(line1);
@@ -122,10 +122,10 @@ public class FileAccessing {
                 writer.write(line + System.lineSeparator());
             }
             writer.close();
-            System.out.println("Password modified successfully");
+            System.out.println("Credentials modified successfully");
         } catch (IOException e) {
             System.out.println("File not found");
-            e.printStackTrace();
+            e.printStackTrace(System.out);
         }
     }
 
@@ -153,7 +153,7 @@ public class FileAccessing {
 
         } catch (FileNotFoundException e) {
             System.out.println("File not found");
-            e.printStackTrace();
+            e.printStackTrace(System.out);
         }
         return null;
     }
@@ -180,7 +180,7 @@ public class FileAccessing {
 
         } catch (FileNotFoundException e) {
             System.out.println("File not found");
-            e.printStackTrace();
+            e.printStackTrace(System.out);
         }
         return null;
     }
@@ -200,7 +200,7 @@ public class FileAccessing {
             scanner.close();
         } catch (FileNotFoundException e) {
             System.out.println("File not found");
-            e.printStackTrace();
+            e.printStackTrace(System.out);
         }
         return location;
     }

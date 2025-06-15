@@ -10,16 +10,19 @@ public class MainMenuGUI implements ActionListener {
 
         frame = new JFrame("Password Manager");
         JPanel panel = new JPanel();
-        frame.setExtendedState(JFrame.MAXIMIZED_BOTH);
+        frame.setSize(500, 500);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.add(panel);
+        frame.setLocationRelativeTo(null);
         panel.setLayout(null);
+        panel.setFocusable(true);
+        SwingUtilities.invokeLater(panel::requestFocusInWindow);
+        frame.add(panel);
 
-        int buttonWidth = 600;
-        int buttonHeight = 100;
-        int centerX = (3440 - buttonWidth) / 2;
-        int startY = 400;
-        int gap = 120;
+        int buttonWidth = 250;
+        int buttonHeight = 70;
+        int centerX = (500 - buttonWidth) / 2;
+        int startY = 20;
+        int gap = 80;
 
         JButton addButton = new JButton("Save new credentials");
         addButton.setBounds(centerX, startY, buttonWidth, buttonHeight);
