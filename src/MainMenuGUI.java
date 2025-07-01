@@ -1,4 +1,5 @@
 import javax.swing.*;
+import java.awt.*;
 
 public class MainMenuGUI {
     private static JFrame frame;
@@ -10,58 +11,78 @@ public class MainMenuGUI {
      */
     public static void Initialize() {
 
-        frame = new JFrame("Password Manager");
-        JPanel panel = new JPanel();
-        frame.setSize(500, 500);
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setLocationRelativeTo(null);
-        panel.setLayout(null);
-        panel.setFocusable(true);
-        SwingUtilities.invokeLater(panel::requestFocusInWindow);
-        frame.add(panel);
+        frame = GUIUtils.createAndConfigureFrame("Main Menu", 500, 500);
+        JPanel panel = (JPanel) frame.getContentPane().getComponent(0); // Get the panel from the frame
 
         int buttonWidth = 250;
         int buttonHeight = 70;
-        int centerX = (frame.getWidth() - 250) / 2;
-        int startY = 20;
-        int gap = 80;
+
+
 
         JButton addButton = new JButton("Save new credentials"); // Button to add new credentials
-        addButton.setBounds(centerX, startY, buttonWidth, buttonHeight);
         addButton.addActionListener(e -> {
             frame.dispose();
-            AddCredentialGUI.Initialize();
+            AddCredentialGUI.Initialize("Please enter new credentials below:", Color.WHITE);
         });
-        panel.add(addButton);
 
         JButton viewButton = new JButton("View credentials"); // Button to view existing credentials
-        viewButton.setBounds(centerX, startY + gap, buttonWidth, buttonHeight);
         viewButton.addActionListener(e -> {
             frame.dispose();
-            ViewCredentialsGUI.Initialize();
+            ViewCredentialsGUI.Initialize("Select credentials to view:", Color.WHITE);
         });
-        panel.add(viewButton);
 
         JButton modifyButton = new JButton("Modify existing credentials"); // Button to modify existing credentials
-        modifyButton.setBounds(centerX, startY + 2 * gap, buttonWidth, buttonHeight);
         modifyButton.addActionListener(e -> {
             frame.dispose();
-            ModifyCredentialsGUI.Initialize();
+            ModifyCredentialsGUI.Initialize("Select credentials to modify:", Color.WHITE);
         });
-        panel.add(modifyButton);
 
         JButton deleteButton = new JButton("Delete existing credentials"); // Button to delete existing credentials
-        deleteButton.setBounds(centerX, startY + 3 * gap, buttonWidth, buttonHeight);
         deleteButton.addActionListener(e -> {
             frame.dispose();
-            DeleteCredentialsGUI.Initialize();
+            DeleteCredentialsGUI.Initialize("Select credentials to delete:", Color.WHITE);
         });
-        panel.add(deleteButton);
 
         JButton exitButton = new JButton("Exit"); // Button to exit the application
-        exitButton.setBounds(centerX, startY + 4 * gap, buttonWidth, buttonHeight);
         exitButton.addActionListener(e -> System.exit(0));
-        panel.add(exitButton);
+
+        addButton.setPreferredSize(new java.awt.Dimension(buttonWidth, buttonHeight));
+        viewButton.setPreferredSize(new java.awt.Dimension(buttonWidth, buttonHeight));
+        modifyButton.setPreferredSize(new java.awt.Dimension(buttonWidth, buttonHeight));
+        deleteButton.setPreferredSize(new java.awt.Dimension(buttonWidth, buttonHeight));
+        exitButton.setPreferredSize(new java.awt.Dimension(buttonWidth, buttonHeight));
+
+        GroupLayout layout = (GroupLayout) panel.getLayout();
+
+        layout.setHorizontalGroup(
+                layout.createParallelGroup(GroupLayout.Alignment.CENTER)
+                        .addGroup(layout.createSequentialGroup()
+                                .addGap(0, 0, Short.MAX_VALUE) // Flexible space on the left
+                                .addGroup(layout.createParallelGroup(GroupLayout.Alignment.CENTER)
+                                        .addComponent(addButton, buttonWidth, buttonWidth, buttonWidth)
+                                        .addComponent(viewButton, buttonWidth, buttonWidth, buttonWidth)
+                                        .addComponent(modifyButton, buttonWidth, buttonWidth, buttonWidth)
+                                        .addComponent(deleteButton, buttonWidth, buttonWidth, buttonWidth)
+                                        .addComponent(exitButton, buttonWidth, buttonWidth, buttonWidth)
+                                )
+                                .addGap(0, 0, Short.MAX_VALUE) // Flexible space on the right
+                        )
+        );
+
+        layout.setVerticalGroup(
+            layout.createSequentialGroup()
+                    .addGap(0, 0, Short.MAX_VALUE)
+                .addComponent(addButton, buttonHeight, buttonHeight, buttonHeight)
+                .addGap(15)
+                .addComponent(viewButton, buttonHeight, buttonHeight, buttonHeight)
+                .addGap(15)
+                .addComponent(modifyButton, buttonHeight, buttonHeight, buttonHeight)
+                .addGap(15)
+                .addComponent(deleteButton, buttonHeight, buttonHeight, buttonHeight)
+                .addGap(15)
+                .addComponent(exitButton, buttonHeight, buttonHeight, buttonHeight)
+                .addGap(0, 0, Short.MAX_VALUE)
+        );
 
         frame.setVisible(true);
     }

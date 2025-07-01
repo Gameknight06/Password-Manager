@@ -17,62 +17,87 @@ public class SetupGUI {
      * Prompts the user to select a vault location and set a master password.
      */
     public static void Initialize() {
-        frame = new JFrame("Create Your Vault");
-        JPanel panel = new JPanel();
-        frame.setSize(500, 450);
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setLocationRelativeTo(null);
-        panel.setLayout(null);
-        frame.add(panel);
+        frame = GUIUtils.createAndConfigureFrame("Setup", 500, 450);
+        JPanel panel = (JPanel) frame.getContentPane().getComponent(0);
 
-        int fieldWidth = 300;
+        int componentWidth = 300;
+        int labelHeight = 25;
         int fieldHeight = 35;
-        int centerX = (frame.getWidth() - fieldWidth) / 2;
+        int buttonHeight = 35;
+        int createButtonHeight = 50;
+        int errorLabelHeight = 25;
 
         JLabel locationLabel = new JLabel("Vault Location:");
-        locationLabel.setBounds(centerX, 20, fieldWidth, 25);
-        panel.add(locationLabel);
-
         locationField = new JTextField();
-        locationField.setBounds(centerX, 45, fieldWidth, fieldHeight);
+        JButton browseButton = new JButton("Browse...");
+        JLabel passwordLabel = new JLabel("Master Password:");
+        passwordField = new JPasswordField();
+        JLabel confirmPasswordLabel = new JLabel("Confirm Master Password:");
+        confirmPasswordField = new JPasswordField();
+        errorLabel = new JLabel("", SwingConstants.CENTER);
+        JButton createVaultButton = new JButton("Create Vault");
+
         locationField.setEditable(false);
         locationField.setBackground(Color.WHITE);
         locationField.setForeground(Color.BLACK);
-        panel.add(locationField);
-
-        JButton browseButton = new JButton("Browse...");
-        browseButton.setBounds(centerX, 85,  fieldWidth, fieldHeight);
-        panel.add(browseButton);
-
-        JLabel passwordLabel = new JLabel("Master Password:");
-        passwordLabel.setBounds(centerX, 135, fieldWidth, 25);
-        panel.add(passwordLabel);
-
-        passwordField = new JPasswordField();
-        passwordField.setBounds(centerX, 160, fieldWidth, fieldHeight);
-        panel.add(passwordField);
-
-        JLabel confirmPasswordLabel = new JLabel("Confirm Master Password:");
-        confirmPasswordLabel.setBounds(centerX, 205, fieldWidth, 25);
-        panel.add(confirmPasswordLabel);
-
-        confirmPasswordField = new JPasswordField();
-        confirmPasswordField.setBounds(centerX, 230, fieldWidth, fieldHeight);
-        panel.add(confirmPasswordField);
-
-        errorLabel = new JLabel();
-        errorLabel.setBounds(centerX, 270, fieldWidth, 25);
         errorLabel.setForeground(Color.RED);
-        errorLabel.setHorizontalAlignment(SwingConstants.CENTER);
-        panel.add(errorLabel);
 
-        JButton createVaultButton = new JButton("Create Vault");
-        createVaultButton.setBounds(centerX, 305, fieldWidth, 50);
-        panel.add(createVaultButton);
+        locationLabel.setPreferredSize(new Dimension(componentWidth, labelHeight));
+        locationField.setPreferredSize(new Dimension(componentWidth, fieldHeight));
+        browseButton.setPreferredSize(new Dimension(componentWidth, buttonHeight));
+        passwordLabel.setPreferredSize(new Dimension(componentWidth, labelHeight));
+        passwordField.setPreferredSize(new Dimension(componentWidth, fieldHeight));
+        confirmPasswordLabel.setPreferredSize(new Dimension(componentWidth, labelHeight));
+        confirmPasswordField.setPreferredSize(new Dimension(componentWidth, fieldHeight));
+        errorLabel.setPreferredSize(new Dimension(componentWidth, errorLabelHeight));
+        createVaultButton.setPreferredSize(new Dimension(componentWidth, createButtonHeight));
 
-        // Action Listeners
         browseButton.addActionListener(e -> selectVaultLocation());
         createVaultButton.addActionListener(e -> createVault());
+
+        locationField.setBackground(Color.GRAY);
+        locationField.setForeground(Color.WHITE);
+
+
+        GroupLayout layout = (GroupLayout) panel.getLayout();
+
+        layout.setHorizontalGroup(
+                layout.createSequentialGroup()
+                        .addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.CENTER)
+                                .addComponent(errorLabel, componentWidth, componentWidth, componentWidth)
+                                .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                                        .addComponent(locationLabel)
+                                        .addComponent(locationField, componentWidth, componentWidth, componentWidth)
+                                        .addComponent(browseButton, componentWidth, componentWidth, componentWidth)
+                                        .addComponent(passwordLabel)
+                                        .addComponent(passwordField, componentWidth, componentWidth, componentWidth)
+                                        .addComponent(confirmPasswordLabel)
+                                        .addComponent(confirmPasswordField, componentWidth, componentWidth, componentWidth)
+                                )
+                                .addComponent(createVaultButton, componentWidth, componentWidth, componentWidth)
+                        )
+                        .addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+        );
+
+        layout.setVerticalGroup(
+                layout.createSequentialGroup()
+                        .addComponent(errorLabel, errorLabelHeight, errorLabelHeight, errorLabelHeight)
+                        .addGap(10)
+                        .addComponent(locationLabel, labelHeight, labelHeight, labelHeight)
+                        .addComponent(locationField, fieldHeight, fieldHeight, fieldHeight)
+                        .addGap(5)
+                        .addComponent(browseButton, buttonHeight, buttonHeight, buttonHeight)
+                        .addGap(15)
+                        .addComponent(passwordLabel, labelHeight, labelHeight, labelHeight)
+                        .addComponent(passwordField, fieldHeight, fieldHeight, fieldHeight)
+                        .addGap(10)
+                        .addComponent(confirmPasswordLabel, labelHeight, labelHeight, labelHeight)
+                        .addComponent(confirmPasswordField, fieldHeight, fieldHeight, fieldHeight)
+                        .addGap(25)
+                        .addComponent(createVaultButton, createButtonHeight, createButtonHeight, createButtonHeight)
+                        .addGap(100)
+        );
 
         frame.setVisible(true);
     }
@@ -131,7 +156,7 @@ public class SetupGUI {
 
         VaultManager.unlockVault(password);
         Arrays.fill(password, ' '); // Clear password
-        Arrays.fill(confirmPassword, ' '); // Clear confirm password
+        Arrays.fill(confirmPassword, ' '); // Clear the confirm password field
 
         frame.dispose();
         MainMenuGUI.Initialize();
