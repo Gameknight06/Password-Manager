@@ -1,8 +1,9 @@
 import javax.swing.*;
+import java.awt.*;
 
 public class ViewCredentialsGUI {
 
-    private static JLabel success;
+    private static JLabel successOrError;
     private static JComboBox<String> credentialList;
     private static JFrame frame;
     private static JComboBox<String> userEmailList;
@@ -11,29 +12,70 @@ public class ViewCredentialsGUI {
      * Initializes the View Credentials GUI.
      * Sets up the frame, panel, and components for viewing credentials.
      */
-    public static void Initialize() {
+    public static void Initialize(String message, Color color) {
         frame = GUIUtils.createAndConfigureFrame("View Credentials", 700, 500);
         JPanel panel = (JPanel) frame.getContentPane().getComponent(0);
 
-        int fieldWidth = 300;
-        int fieldHeight = 50;
+        int boxWidth = 250;
+        int boxHeight = 50;
         int buttonWidth = 150;
         int buttonHeight = 50;
-        int centerX = (frame.getWidth() - fieldWidth) / 2;
+        int labelWidth = 300;
+        int labelHeight = 50;
 
-        success = GUIUtils.createMessageLabel(panel, centerX + 20, 70, 300, 60);
+        successOrError = new JLabel(message, SwingConstants.CENTER);
+        successOrError.setForeground(color);
 
         credentialList = new JComboBox<>();
-        credentialList.setBounds(centerX - 50, 140, fieldWidth, fieldHeight);
         GUIUtils.refreshLocations(credentialList);
-        panel.add(credentialList);
 
         JButton viewButton = new JButton("View");
-        viewButton.setBounds(centerX + 300, 140, buttonWidth, buttonHeight);
         viewButton.addActionListener(e -> viewButton());
-        panel.add(viewButton);
+        JButton menuButton = GUIUtils.addMenuButton(frame);
 
-        GUIUtils.addMenuButton(frame, panel, 10, 10, buttonWidth, buttonHeight);
+        successOrError.setPreferredSize(new java.awt.Dimension(labelWidth, labelHeight));
+        credentialList.setPreferredSize(new java.awt.Dimension(boxWidth, boxHeight));
+        viewButton.setPreferredSize(new java.awt.Dimension(buttonWidth, buttonHeight));
+        menuButton.setPreferredSize(new java.awt.Dimension(buttonWidth, buttonHeight));
+
+        GroupLayout layout = (GroupLayout) panel.getLayout();
+
+        layout.setHorizontalGroup(
+                layout.createParallelGroup(GroupLayout.Alignment.CENTER)
+                        .addGroup(layout.createSequentialGroup()
+                                .addComponent(menuButton, buttonWidth, buttonWidth, buttonWidth)
+                                .addGap(0, 0, Short.MAX_VALUE)
+                        )
+                        .addGroup(layout.createSequentialGroup()
+                                .addGap(0, 0, Short.MAX_VALUE)
+                                .addComponent(successOrError, labelWidth, labelWidth, labelWidth)
+                                .addGap(0, 0, Short.MAX_VALUE)
+                        )
+                        .addGroup(layout.createSequentialGroup()
+                                .addGap(0, 0, Short.MAX_VALUE)
+                                .addComponent(credentialList, boxWidth, boxWidth, boxWidth)
+                                .addGap(20)
+                                .addComponent(viewButton, buttonWidth, buttonWidth, buttonWidth)
+                                .addGap(0, 0, Short.MAX_VALUE)
+                        )
+
+        );
+
+        layout.setVerticalGroup(
+                layout.createSequentialGroup()
+                        .addGap(10)
+                        .addComponent(menuButton, buttonHeight, buttonHeight, buttonHeight)
+                        .addGap(20)
+                        .addGap(0, 0, Short.MAX_VALUE)
+                        .addComponent(successOrError, labelHeight, labelHeight, labelHeight)
+                        .addGap(15)
+                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.CENTER)
+                                .addComponent(credentialList, boxHeight, boxHeight, boxHeight)
+                                .addComponent(viewButton, buttonHeight, buttonHeight, buttonHeight)
+                        )
+                        .addGap(0, 0, Short.MAX_VALUE)
+                        .addGap(200)
+        );
 
         frame.setVisible(true);
     }
@@ -45,59 +87,89 @@ public class ViewCredentialsGUI {
     private static void viewCredentials(String locationToFind, String username) {
         String password = VaultManager.findPassword(locationToFind, username);
 
-        JFrame frame = new JFrame("View Credentials");
-        JPanel panel = new JPanel();
-        frame.setSize(700, 500);
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setLocationRelativeTo(null);
-        panel.setLayout(null);
-        panel.setFocusable(true);
-        SwingUtilities.invokeLater(panel::requestFocusInWindow);
-        frame.add(panel);
+        JFrame frame = GUIUtils.createAndConfigureFrame("View Credentials", 700, 500);
+        JPanel panel = (JPanel) frame.getContentPane().getComponent(0);
 
+        int labelWidth = 150;
+        int labelHeight = 15;
         int fieldWidth = 300;
         int fieldHeight = 50;
-        int labelWidth = 600;
-        int labelHeight = 50;
-        int buttonWidth = 150;
+        int buttonWidth = 130;
         int buttonHeight = 50;
-        int centerX = (700 - fieldWidth) / 2;
 
-        JLabel locationLabel = new JLabel("Location:");
-        locationLabel.setBounds(centerX, 65, labelWidth, labelHeight);
-        panel.add(locationLabel);
-
-        JLabel usernameLabel = new JLabel("Username/Email:");
-        usernameLabel.setBounds(centerX, 145, labelWidth, labelHeight);
-        panel.add(usernameLabel);
-
-        JLabel passwordLabel = new JLabel("Password:");
-        passwordLabel.setBounds(centerX, 225, labelWidth, labelHeight);
-        panel.add(passwordLabel);
+        JLabel locationLabel = new JLabel("  Location:");
+        JLabel usernameLabel = new JLabel("  Username/Email:");
+        JLabel passwordLabel = new JLabel("  Password:");
 
         JTextField locationField = new JTextField(locationToFind);
-        locationField.setBounds(centerX - 5, 100, fieldWidth, fieldHeight);
         locationField.setEditable(false);
-        panel.add(locationField);
 
         JTextField usernameField = new JTextField(username);
-        usernameField.setBounds(centerX - 5, 180, fieldWidth, fieldHeight);
         usernameField.setEditable(false);
-        panel.add(usernameField);
 
         JTextField passwordField = new JTextField(password);
-        passwordField.setBounds(centerX - 5, 260, fieldWidth, fieldHeight);
         passwordField.setEditable(false);
-        panel.add(passwordField);
 
         JButton backButton = new JButton("Back");
-        backButton.setBounds(10, 10, buttonWidth, buttonHeight);
         backButton.putClientProperty("JButton.buttonType", "square");
         backButton.addActionListener(e -> {
             frame.dispose();
-            Initialize();
+            Initialize("Select credentials to view", Color.WHITE);
         });
-        panel.add(backButton);
+
+        locationLabel.setPreferredSize(new java.awt.Dimension(labelWidth, labelHeight));
+        usernameLabel.setPreferredSize(new java.awt.Dimension(labelWidth, labelHeight));
+        passwordLabel.setPreferredSize(new java.awt.Dimension(labelWidth, labelHeight));
+        locationField.setPreferredSize(new java.awt.Dimension(fieldWidth, fieldHeight));
+        usernameField.setPreferredSize(new java.awt.Dimension(fieldWidth, fieldHeight));
+        passwordField.setPreferredSize(new java.awt.Dimension(fieldWidth, fieldHeight));
+        backButton.setPreferredSize(new java.awt.Dimension(buttonWidth, buttonHeight));
+
+        GroupLayout layout = (GroupLayout) panel.getLayout();
+
+        layout.setHorizontalGroup(
+                layout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                        .addGroup(layout.createSequentialGroup()
+                                .addComponent(backButton, buttonWidth, buttonWidth, buttonWidth)
+                                .addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addGroup(layout.createSequentialGroup()
+                                .addGap(0, 0, Short.MAX_VALUE)
+                                .addGroup(layout.createParallelGroup(GroupLayout.Alignment.CENTER)
+                                        .addComponent(locationLabel, fieldWidth, fieldWidth, fieldWidth)
+                                        .addComponent(locationField, fieldWidth, fieldWidth, fieldWidth)
+                                        .addComponent(usernameLabel, fieldWidth, fieldWidth, fieldWidth)
+                                        .addComponent(usernameField, fieldWidth, fieldWidth, fieldWidth)
+                                        .addComponent(passwordLabel, fieldWidth, fieldWidth, fieldWidth)
+                                        .addComponent(passwordField, fieldWidth, fieldWidth, fieldWidth)
+                                )
+                                .addGap(0, 0, Short.MAX_VALUE)
+                        )
+        );
+
+        layout.setVerticalGroup(
+                layout.createSequentialGroup()
+                        .addComponent(backButton, buttonHeight, buttonHeight, buttonHeight)
+                        .addGap(50)
+                        .addGroup(layout.createSequentialGroup()
+                                .addComponent(locationLabel, labelHeight, labelHeight, labelHeight)
+                                .addGap(5)
+                                .addComponent(locationField, fieldHeight, fieldHeight, fieldHeight)
+                        )
+                        .addGap(15)
+                        .addGroup(layout.createSequentialGroup()
+                                .addComponent(usernameLabel, labelHeight, labelHeight, labelHeight)
+                                .addGap(5)
+                                .addComponent(usernameField, fieldHeight, fieldHeight, fieldHeight)
+                        )
+                        .addGap(15)
+                        .addGroup(layout.createSequentialGroup()
+                                .addComponent(passwordLabel, labelHeight, labelHeight, labelHeight)
+                                .addGap(5)
+                                .addComponent(passwordField, fieldHeight, fieldHeight, fieldHeight)
+                        )
+                        .addGap(0, 0, Short.MAX_VALUE)
+        );
+
 
         frame.setVisible(true);
     }
@@ -107,61 +179,104 @@ public class ViewCredentialsGUI {
      * Displays a new JFrame with a JComboBox to select the username/email associated with the location.
      */
     private static void duplicateLocation(String location) {
-        JFrame frame = new JFrame("Duplicate Location");
-        JPanel panel = new JPanel();
-        frame.setSize(400, 300);
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setLocationRelativeTo(null);
-        panel.setFocusable(true);
-        panel.setLayout(null);
-        frame.add(panel);
+        JFrame frame = GUIUtils.createAndConfigureFrame("Duplicate Location",500, 400);
+        JPanel panel = (JPanel) frame.getContentPane().getComponent(0); // Get the panel from the frame
 
-        int fieldWidth = 200;
-        int fieldHeight = 50;
+        int boxWidth = 250;
+        int boxHeight = 50;
         int buttonWidth = 150;
-        int buttonHeight = 40;
-        int centerX = (frame.getWidth() - buttonWidth) / 2;
+        int buttonHeight = 50;
+        int backButtonWidth = 110;
+        int backButtonHeight = 40;
+        int labelWidth = 300;
+        int labelHeight = 50;
 
         JLabel messageLabel = new JLabel("There is more than one entry for " + location);
-        messageLabel.setBounds(0, 0, 360, 50);
-        messageLabel.setHorizontalAlignment(SwingConstants.CENTER);
-        panel.add(messageLabel);
-
-        success = GUIUtils.createMessageLabel(panel, centerX - 85, 20, 300, 60);
-
+        successOrError = new JLabel();
         userEmailList = new JComboBox<>();
-        userEmailList.setBounds(centerX - 110, 70, fieldWidth, fieldHeight);
-        GUIUtils.refreshUsernames(userEmailList, location);
-        panel.add(userEmailList);
-
         JButton viewButton = new JButton("View");
-        viewButton.setBounds(centerX + 100, 70, buttonWidth, buttonHeight);
-        viewButton.addActionListener(e -> viewButtonDup());
-        panel.add(viewButton);
-
         JButton backButton = new JButton("Back");
-        backButton.setBounds(centerX + 100, 140, buttonWidth, buttonHeight);
+
+        GUIUtils.refreshUsernames(userEmailList, location); // Refresh usernames based on the selected location
+        successOrError.setForeground(Color.RED);
+
+        viewButton.addActionListener(e -> {
+            String selected = (String) userEmailList.getSelectedItem();
+            if (selected == null) {
+                successOrError.setText("No credentials available");
+                return;
+            } else if(selected.equals("Select Username/Email...")) { // Check for default selection
+                successOrError.setText("Please select a valid location");
+                return;
+            }
+            frame.dispose();
+            viewCredentials(location, selected);
+        });
+
         backButton.addActionListener(e -> {
             frame.dispose();
-            Initialize();
+            Initialize("Select credentials to view:", Color.WHITE);
         });
-        panel.add(backButton);
+
+        messageLabel.setPreferredSize(new java.awt.Dimension(labelWidth, labelHeight));
+        successOrError.setPreferredSize(new java.awt.Dimension(labelWidth, labelHeight));
+        userEmailList.setPreferredSize(new java.awt.Dimension(boxWidth, boxHeight));
+        viewButton.setPreferredSize(new java.awt.Dimension(buttonWidth, buttonHeight));
+        backButton.setPreferredSize(new java.awt.Dimension(backButtonWidth, backButtonHeight));
+
+        GroupLayout layout = (GroupLayout) panel.getLayout();
+
+        layout.setHorizontalGroup(
+                layout.createParallelGroup(GroupLayout.Alignment.CENTER)
+                        .addGroup(layout.createSequentialGroup()
+                                .addComponent(backButton, backButtonWidth, backButtonWidth, backButtonWidth)
+                                .addGap(0, 0, Short.MAX_VALUE)
+                        )
+                        .addComponent(messageLabel)
+                        .addComponent(successOrError)
+                        .addGroup(layout.createSequentialGroup()
+                                .addGap(0, 0, Short.MAX_VALUE)
+                                .addComponent(userEmailList, boxWidth, boxWidth, boxWidth)
+                                .addGap(15)
+                                .addGroup(layout.createParallelGroup(GroupLayout.Alignment.CENTER)
+                                        .addComponent(viewButton, buttonWidth, buttonWidth, buttonWidth)
+                                )
+                                .addGap(0, 0, Short.MAX_VALUE)
+                        )
+        );
+
+        layout.setVerticalGroup(
+                layout.createSequentialGroup()
+                        .addComponent(backButton, backButtonHeight, backButtonHeight, backButtonHeight)
+                        .addGap(45)
+                        .addComponent(messageLabel)
+                        .addGap(20)
+                        .addComponent(successOrError)
+                        .addGap(5)
+                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.CENTER)
+                                .addComponent(userEmailList, boxHeight, boxHeight, boxHeight)
+                                .addComponent(viewButton, buttonHeight, buttonHeight, buttonHeight)
+                        )
+                        .addGap(0, 0, Short.MAX_VALUE)
+        );
 
         frame.setVisible(true);
     }
 
     /**
-     * Handles the action of viewing credentials for a single location.
-     * It checks for duplicates and either opens the single view GUI or opens the duplicate location GUI.
+     * Handles the action of viewing credentials.
+     * If there are duplicates, it calls the duplicateLocation method.
+     * Otherwise, it views the selected credentials.
      */
     private static void viewButton() {
         String selected = (String) credentialList.getSelectedItem();
         String username = VaultManager.findUsername(selected);
         if (selected == null) {
-            success.setText("No credentials available");
+            successOrError.setText("No credentials available");
             return;
         } else if(selected.equals("Select Location...")) {
-            success.setText("Please select a valid location");
+            successOrError.setForeground(Color.RED);
+            successOrError.setText("Please select a valid location");
             return;
         }
 
@@ -172,24 +287,6 @@ public class ViewCredentialsGUI {
             frame.dispose();
             viewCredentials(selected, username);
         }
-    }
-
-    /**
-     * Handles the action of viewing credentials for a single location with a specific username/email.
-     * It retrieves the selected username/email and calls the viewCredentials method.
-     */
-    private static void viewButtonDup() {
-        String selected = (String) credentialList.getSelectedItem();
-        String username = (String) userEmailList.getSelectedItem();
-        if (username == null) {
-            success.setText("No credentials available");
-            return;
-        } else if(username.equals("Select Username/Email...")) {
-            success.setText("Please select a valid location");
-            return;
-        }
-        frame.dispose();
-        viewCredentials(selected, username);
     }
 
 }

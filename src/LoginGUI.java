@@ -12,43 +12,67 @@ public class LoginGUI {
      * Prompts the user to enter their master password to unlock the vault.
      */
     public static void login() {
-        frame = new JFrame("Password Manager Login");
-        JPanel panel = new JPanel();
-        frame.setSize(500, 300);
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setLocationRelativeTo(null);
-        panel.setLayout(null);
-        panel.setFocusable(true);
-        SwingUtilities.invokeLater(panel::requestFocusInWindow);
-        frame.add(panel);
+        frame = GUIUtils.createAndConfigureFrame("Login", 500, 350);
+        JPanel panel = (JPanel) frame.getContentPane().getComponent(0);
 
-        int fieldWidth = 300;
-        int fieldHeight = 50;
-        int centerX = (frame.getWidth() - fieldWidth) / 2;
+        int componentWidth = 150;
+        int passwordFieldWidth = 300;
+        int errorLabelWidth = 400;
+        int titleHeight = 30;
+        int passwordFieldHeight = 50;
+        int loginButtonHeight = 50;
+        int errorLabelHeight = 40;
 
-        JLabel titleLabel = new JLabel("Enter Master Password");
-        titleLabel.setBounds(centerX, 30, fieldWidth, 30);
-        titleLabel.setHorizontalAlignment(SwingConstants.CENTER);
-        panel.add(titleLabel);
-
-        JButton loginButton = new JButton("Login");
-        loginButton.setBounds(centerX, 150, fieldWidth, 40);
-        loginButton.addActionListener(e -> loginButton());
-        panel.add(loginButton);
-
-        errorLabel = new JLabel("");
-        errorLabel.setBounds(centerX, 115, fieldWidth, 25);
-        errorLabel.setHorizontalAlignment(SwingConstants.CENTER);
-        panel.add(errorLabel);
-
+        JLabel titleLabel = new JLabel("Enter Master Password", SwingConstants.CENTER);
+        errorLabel = new JLabel("", SwingConstants.CENTER);
         passwordField = new JPasswordField();
-        passwordField.setForeground(Color.GRAY);
-        passwordField.setBounds(centerX, 70, fieldWidth, fieldHeight);
-        panel.add(passwordField);
+        JButton loginButton = new JButton("Login");
+        loginButton.addActionListener(e -> loginButton());
+
+        titleLabel.setPreferredSize(new java.awt.Dimension(componentWidth, titleHeight));
+        passwordField.setPreferredSize(new java.awt.Dimension(passwordFieldWidth, passwordFieldHeight));
+        loginButton.setPreferredSize(new java.awt.Dimension(componentWidth, loginButtonHeight));
+        errorLabel.setPreferredSize(new java.awt.Dimension(errorLabelWidth, errorLabelHeight));
+
+        errorLabel.setForeground(Color.RED);
+
+        GroupLayout layout = (GroupLayout) panel.getLayout();
+
+        layout.setHorizontalGroup(
+                layout.createParallelGroup(GroupLayout.Alignment.CENTER)
+                        .addGroup(layout.createSequentialGroup()
+                                .addGap(0, 0, Short.MAX_VALUE) // Flexible space on the left
+                                .addGroup(layout.createParallelGroup(GroupLayout.Alignment.CENTER)
+                                        .addComponent(titleLabel, componentWidth, componentWidth, componentWidth) // min, pref, max
+                                        .addComponent(passwordField, passwordFieldWidth, passwordFieldWidth, passwordFieldWidth)
+                                        .addComponent(loginButton, componentWidth, componentWidth, componentWidth)
+                                        .addComponent(errorLabel, errorLabelWidth, errorLabelWidth, errorLabelWidth)
+                                )
+                                .addGap(0, 0, Short.MAX_VALUE) // Flexible space on the right
+                        )
+        );
+
+
+        layout.setVerticalGroup(
+            layout.createSequentialGroup()
+                    .addGap(5)
+                    .addComponent(errorLabel, errorLabelHeight, errorLabelHeight, errorLabelHeight)
+                    .addComponent(titleLabel, titleHeight, titleHeight, titleHeight)
+                    .addGap(15)
+                    .addComponent(passwordField, passwordFieldHeight, passwordFieldHeight, passwordFieldHeight)
+                    .addGap(15)
+                    .addComponent(loginButton, loginButtonHeight, loginButtonHeight, loginButtonHeight)
+                    .addGap(0, 0, Short.MAX_VALUE)
+        );
 
         frame.setVisible(true);
     }
 
+
+    /**
+     * Handles the login button action.
+     * Validates the entered password and unlocks the vault if correct.
+     */
     private static void loginButton() {
         char[] password = passwordField.getPassword();
 

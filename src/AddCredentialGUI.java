@@ -9,17 +9,15 @@ public class AddCredentialGUI {
     private static JTextField passwordField;
     private static JTextField user_emailField;
     private static JTextField locationField;
-    private static JLabel success;
+    private static JLabel successOrError;
     private static JComboBox<String> userEmailList;
     private static JFrame frame;
-    private static JLabel error;
-
     /**
      * Initializes the Add Credential GUI.
      * This method sets up the frame, panel, and input fields for adding new credentials.
      * It includes focus listeners for input fields, a save button, and a back button to return to the main menu.
      */
-    public static void Initialize() {
+    public static void Initialize(String message, Color color) {
 
         frame = GUIUtils.createAndConfigureFrame("Add New Credentials", 700, 500);
         JPanel panel = (JPanel) frame.getContentPane().getComponent(0);
@@ -27,13 +25,18 @@ public class AddCredentialGUI {
         int fieldWidth = 300;
         int fieldHeight = 50;
         int buttonWidth = 150;
-        int buttonHeight = 40;
-        int centerX = (frame.getWidth() - fieldWidth) / 2;
+        int buttonHeight = 50;
 
+        successOrError = new JLabel(message, SwingConstants.CENTER);
+        successOrError.setForeground(color);
+
+        JButton saveButton = new JButton("Save");
+        saveButton.addActionListener(e -> saveButton());
+
+        JButton menuButton = GUIUtils.addMenuButton(frame);
 
         locationField = new JTextField("Location", 20);
         locationField.setForeground(Color.GRAY);
-        locationField.setBounds(centerX, 100, fieldWidth, fieldHeight);
         locationField.setToolTipText("Enter the location where the password is used");
         locationField.addFocusListener(new FocusListener() { // FocusListener to handle taking out and putting in text based on focus
             @Override
@@ -52,10 +55,8 @@ public class AddCredentialGUI {
                 }
             }
         });
-        panel.add(locationField);
 
         user_emailField = new JTextField("Username/Email", 20);
-        user_emailField.setBounds(centerX, 170, fieldWidth, fieldHeight);
         user_emailField.setForeground(Color.GRAY);
         user_emailField.setToolTipText("Enter the username or email address associated with the password");
         user_emailField.addFocusListener(new FocusListener() { // FocusListener to handle taking out and putting in text based on focus
@@ -75,11 +76,9 @@ public class AddCredentialGUI {
                 }
             }
         });
-        panel.add(user_emailField);
 
         passwordField = new JTextField("Password", 20);
         passwordField.setForeground(Color.GRAY);
-        passwordField.setBounds(centerX, 240, fieldWidth, fieldHeight);
         passwordField.setToolTipText("Enter the password for the specified location and username/email");
         passwordField.addFocusListener(new FocusListener() { // FocusListener to handle taking out and putting in text based on focus
             @Override
@@ -98,39 +97,51 @@ public class AddCredentialGUI {
                 }
             }
         });
-        panel.add(passwordField);
 
-        JButton saveButton = new JButton("Save");
-        saveButton.setBounds(centerX + 70, 340, buttonWidth, buttonHeight);
-        saveButton.addActionListener(e -> saveButton());
-        panel.add(saveButton);
+        locationField.setPreferredSize(new Dimension(fieldWidth, fieldHeight));
+        user_emailField.setPreferredSize(new Dimension(fieldWidth, fieldHeight));
+        passwordField.setPreferredSize(new Dimension(fieldWidth, fieldHeight));
+        saveButton.setPreferredSize(new Dimension(buttonWidth, buttonHeight));
+        menuButton.setPreferredSize(new Dimension(buttonWidth, buttonHeight));
+        successOrError.setPreferredSize(new Dimension(fieldWidth, fieldHeight));
 
-        JButton menuButton = new JButton("Back to Menu");
-        menuButton.putClientProperty("JButton.buttonType", "square");
-        menuButton.setBounds(10, 10, buttonWidth, buttonHeight);
-        menuButton.addActionListener(e -> {
-            frame.dispose();
-            MainMenuGUI.Initialize();
-        });
-        panel.add(menuButton);
+        GroupLayout layout = (GroupLayout) panel.getLayout();
 
-        success = new JLabel();
-        success.setBounds(centerX, 50, 300, 60);
-        success.setHorizontalAlignment(SwingConstants.CENTER);
-        panel.add(success);
+        layout.setHorizontalGroup(
+                layout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                        .addGroup(layout.createSequentialGroup()
+                                .addComponent(menuButton, buttonWidth, buttonWidth, buttonWidth)
+                                .addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addGroup(layout.createSequentialGroup()
+                                .addGap(0, 0, Short.MAX_VALUE)
+                                .addGroup(layout.createParallelGroup(GroupLayout.Alignment.CENTER)
+                                        .addComponent(successOrError, fieldWidth, fieldWidth, fieldWidth)
+                                        .addComponent(locationField, fieldWidth, fieldWidth, fieldWidth)
+                                        .addComponent(user_emailField, fieldWidth, fieldWidth, fieldWidth)
+                                        .addComponent(passwordField, fieldWidth, fieldWidth, fieldWidth)
+                                        .addComponent(saveButton, buttonWidth, buttonWidth, buttonWidth)
+                                )
+                                .addGap(0, 0, Short.MAX_VALUE)
+                        )
+        );
+
+        layout.setVerticalGroup(
+                layout.createSequentialGroup()
+                        .addComponent(menuButton, buttonHeight, buttonHeight, buttonHeight)
+                        .addGap(5)
+                        .addComponent(successOrError, 30, 30, 30)
+                        .addGap(10)
+                        .addComponent(locationField, fieldHeight, fieldHeight, fieldHeight)
+                        .addGap(25)
+                        .addComponent(user_emailField, fieldHeight, fieldHeight, fieldHeight)
+                        .addGap(25)
+                        .addComponent(passwordField, fieldHeight, fieldHeight, fieldHeight)
+                        .addGap(50)
+                        .addComponent(saveButton, buttonHeight, buttonHeight, buttonHeight)
+                        .addGap(0, 0, Short.MAX_VALUE)
+        );
 
         frame.setVisible(true);
-    }
-
-    /**
-     * Clears the input fields and resets the success message.
-     * This method is called after saving credentials or when the user wants to enter new credentials.
-     */
-    private static void clearFields() {
-        passwordField.setText("");
-        user_emailField.setText("");
-        locationField.setText("");
-        success.setText("Enter new credentials:");
     }
 
     /**
@@ -148,14 +159,11 @@ public class AddCredentialGUI {
         String testLocation = location.toUpperCase();
 
         if (location.equals("Location") || user_email.equals("Username/Email") || password.equals("Password")) {
-            success.setText("Please fill in all fields!");
-            return;
-        }
-
-        if (!password.isEmpty() && !testLocations.contains(testLocation)) {
-            VaultManager.saveLogin(password, location, user_email);
-            clearFields();
-            success.setText("Successfully Encrypted and saved!");
+            successOrError.setForeground(Color.RED);
+            successOrError.setText("Please fill in all fields!");
+        } else if (password.contains(" ") || user_email.contains(" ") || location.contains(" ")) {
+            successOrError.setForeground(Color.RED);
+            successOrError.setText("No spaces allowed in any of the fields!");
         } else if (testLocations.contains(testLocation)) {
             String realLocation = "";
             for (String loc : locations) {
@@ -163,10 +171,15 @@ public class AddCredentialGUI {
                     realLocation = loc;
                 }
             }
+            frame.dispose();
             duplicateLocation(realLocation);
-        } else {
-            success.setText("Password field is empty!");
+        } else if (!password.isEmpty() && !testLocations.contains(testLocation)) {
+            VaultManager.saveLogin(password, location, user_email);
+            clearFields();
+            successOrError.setForeground(Color.GREEN);
+            successOrError.setText("Successfully Encrypted and saved!");
         }
+
     }
 
     /**
@@ -174,49 +187,77 @@ public class AddCredentialGUI {
      * It prompts the user with options to overwrite the existing credentials, save as additional credentials, or to cancel.
      */
     private static void duplicateLocation(String location) {
-        JFrame frame = new JFrame("Duplicate Location");
-        JPanel panel = new JPanel();
-        frame.setSize(400, 200);
-        frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        frame.setLocationRelativeTo(null);
-        panel.setFocusable(true);
-        panel.setLayout(null);
-        frame.add(panel);
+        JFrame frame = GUIUtils.createAndConfigureFrame("Duplicate Location",400, 200);
+        JPanel panel = (JPanel) frame.getContentPane().getComponent(0); // Get the panel from the frame
 
         int buttonWidth = 150;
         int buttonHeight = 40;
-        int centerX = (frame.getWidth() - buttonWidth) / 2;
+        int labelWidth = 400;
+        int labelHeight = 20;
 
         JLabel messageLabel = new JLabel("Credentials for this location already exist.");
-        messageLabel.setBounds(centerX - 30, 0, 360, 50);
-        panel.add(messageLabel);
 
         JButton overwriteButton = new JButton("Overwrite");
-        overwriteButton.setBounds(centerX - 80, 40, buttonWidth, buttonHeight);
         overwriteButton.addActionListener(e -> {
             frame.dispose();
             duplicateLocationOverwrite(location);
         });
-        panel.add(overwriteButton);
 
         JButton additionalButton = new JButton("Save as Additional");
-        additionalButton.setBounds(centerX + 80, 40, buttonWidth, buttonHeight);
         additionalButton.addActionListener(e -> {
             VaultManager.saveLogin(passwordField.getText(), location, user_emailField.getText());
             clearFields();
-            success.setText("Successfully Saved as Additional Credentials!");
             frame.dispose();
+            Initialize("Successfully Saved as Additional Credentials!", Color.GREEN);
         });
-        panel.add(additionalButton);
 
         JButton cancelButton = new JButton("Cancel");
-        cancelButton.setBounds(centerX, 100, buttonWidth, buttonHeight);
         cancelButton.addActionListener(e -> {
             clearFields();
-            success.setText("Operation Cancelled. Please enter new credentials:");
+            successOrError.setForeground(Color.RED);
+            successOrError.setText("Operation Cancelled. Please enter new credentials:");
             frame.dispose();
         });
-        panel.add(cancelButton);
+
+        messageLabel.setPreferredSize(new java.awt.Dimension(labelWidth, labelHeight));
+        successOrError.setPreferredSize(new java.awt.Dimension(labelWidth, labelHeight));
+        additionalButton.setPreferredSize(new java.awt.Dimension(buttonWidth, buttonHeight));
+        overwriteButton.setPreferredSize(new java.awt.Dimension(buttonWidth, buttonHeight));
+        cancelButton.setPreferredSize(new java.awt.Dimension(buttonWidth, buttonHeight));
+
+        GroupLayout layout = (GroupLayout) panel.getLayout();
+
+        layout.setHorizontalGroup(
+                layout.createParallelGroup(GroupLayout.Alignment.CENTER)
+                        .addGroup(layout.createSequentialGroup()
+                                .addGap(0, 0, Short.MAX_VALUE)
+                                .addComponent(messageLabel)
+                                .addGap(0, 0, Short.MAX_VALUE))
+                        .addGroup(layout.createSequentialGroup()
+                                .addGap(0, 0, Short.MAX_VALUE)
+                                .addComponent(overwriteButton, buttonWidth, buttonWidth, buttonWidth)
+                                .addGap(20)
+                                .addComponent(additionalButton, buttonWidth, buttonWidth, buttonWidth)
+                                .addGap(0, 0, Short.MAX_VALUE))
+                        .addGroup(layout.createSequentialGroup()
+                                .addGap(0, 0, Short.MAX_VALUE)
+                                .addComponent(cancelButton, buttonWidth, buttonWidth, buttonWidth)
+                                .addGap(0, 0, Short.MAX_VALUE))
+        );
+
+        layout.setVerticalGroup(
+                layout.createSequentialGroup()
+                        .addGap(10)
+                        .addComponent(messageLabel)
+                        .addGap(10)
+                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                .addComponent(overwriteButton, buttonHeight, buttonHeight, buttonHeight)
+                                .addComponent(additionalButton, buttonHeight, buttonHeight, buttonHeight)
+                        )
+                        .addGap(15)
+                        .addComponent(cancelButton, buttonHeight, buttonHeight, buttonHeight)
+                        .addGap(0, 0, Short.MAX_VALUE)
+        );
 
         frame.setVisible(true);
     }
@@ -226,43 +267,91 @@ public class AddCredentialGUI {
      * It allows the user to select a username/email from a dropdown and overwrite the credentials.
      */
     private static void duplicateLocationOverwrite(String location) {
-        frame = GUIUtils.createAndConfigureFrame("Duplicate Location", 400, 300);
+        JFrame frame = GUIUtils.createAndConfigureFrame("Duplicate Location",500, 400);
         JPanel panel = (JPanel) frame.getContentPane().getComponent(0); // Get the panel from the frame
 
-        int fieldWidth = 200;
-        int fieldHeight = 50;
+        int boxWidth = 250;
+        int boxHeight = 50;
         int buttonWidth = 150;
-        int buttonHeight = 40;
-        int centerX = (frame.getWidth() - buttonWidth) / 2;
+        int buttonHeight = 50;
+        int backButtonWidth = 110;
+        int backButtonHeight = 40;
+        int labelWidth = 300;
+        int labelHeight = 50;
 
-        JLabel messageLabel = new JLabel("There is more than one entry for " + location);
-        messageLabel.setBounds(0, 0, 360, 50);
-        messageLabel.setHorizontalAlignment(SwingConstants.CENTER);
-        panel.add(messageLabel);
-
-        error = new JLabel("");
-        error.setBounds(centerX - 85, 20, 300, 60);
-        panel.add(error);
-
+        JLabel messageLabel = new JLabel("Select which credentials to overwrite for " + location);
+        successOrError = new JLabel();
         userEmailList = new JComboBox<>();
-        userEmailList.setBounds(centerX - 110, 70, fieldWidth, fieldHeight);
-        GUIUtils.refreshUsernames(userEmailList, location);
-        panel.add(userEmailList);
-
-        JButton viewButton = new JButton("Overwrite");
-        viewButton.setBounds(centerX + 100, 70, buttonWidth, buttonHeight);
-        viewButton.addActionListener(e -> overwriteButton(location));
-        panel.add(viewButton);
-
+        JButton overwriteButton = new JButton("Overwrite");
         JButton backButton = new JButton("Back");
-        backButton.setBounds(centerX + 100, 140, buttonWidth, buttonHeight);
+
+        GUIUtils.refreshUsernames(userEmailList, location); // Refresh usernames based on the selected location
+        successOrError.setForeground(Color.RED);
+
+        overwriteButton.addActionListener(e -> overwriteButton(location));
+
         backButton.addActionListener(e -> {
             frame.dispose();
-            Initialize();
+            Initialize("Please enter new credentials below:", Color.WHITE);
         });
-        panel.add(backButton);
+
+        messageLabel.setPreferredSize(new java.awt.Dimension(labelWidth, labelHeight));
+        successOrError.setPreferredSize(new java.awt.Dimension(labelWidth, labelHeight));
+        userEmailList.setPreferredSize(new java.awt.Dimension(boxWidth, boxHeight));
+        overwriteButton.setPreferredSize(new java.awt.Dimension(buttonWidth, buttonHeight));
+        backButton.setPreferredSize(new java.awt.Dimension(backButtonWidth, backButtonHeight));
+
+        GroupLayout layout = (GroupLayout) panel.getLayout();
+
+        layout.setHorizontalGroup(
+                layout.createParallelGroup(GroupLayout.Alignment.CENTER)
+                        .addGroup(layout.createSequentialGroup()
+                                .addComponent(backButton, backButtonWidth, backButtonWidth, backButtonWidth)
+                                .addGap(0, 0, Short.MAX_VALUE)
+                        )
+                        .addComponent(messageLabel)
+                        .addComponent(successOrError)
+                        .addGroup(layout.createSequentialGroup()
+                                .addGap(0, 0, Short.MAX_VALUE)
+                                .addComponent(userEmailList, boxWidth, boxWidth, boxWidth)
+                                .addGap(15)
+                                .addGroup(layout.createParallelGroup(GroupLayout.Alignment.CENTER)
+                                        .addComponent(overwriteButton, buttonWidth, buttonWidth, buttonWidth)
+                                )
+                                .addGap(0, 0, Short.MAX_VALUE)
+                        )
+        );
+
+        layout.setVerticalGroup(
+                layout.createSequentialGroup()
+                        .addComponent(backButton, backButtonHeight, backButtonHeight, backButtonHeight)
+                        .addGap(45)
+                        .addComponent(messageLabel)
+                        .addGap(20)
+                        .addComponent(successOrError)
+                        .addGap(5)
+                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.CENTER)
+                                .addComponent(userEmailList, boxHeight, boxHeight, boxHeight)
+                                .addComponent(overwriteButton, buttonHeight, buttonHeight, buttonHeight)
+                        )
+                        .addGap(0, 0, Short.MAX_VALUE)
+        );
 
         frame.setVisible(true);
+    }
+
+    /**
+     * Clears the input fields and resets the success message.
+     * This method is called after saving credentials or when the user wants to enter new credentials.
+     * It also resets the placeholder text and color.
+     */
+    private static void clearFields() {
+        passwordField.setText("Password");
+        passwordField.setForeground(Color.GRAY);
+        user_emailField.setText("Username/Email");
+        user_emailField.setForeground(Color.GRAY);
+        locationField.setText("Location");
+        locationField.setForeground(Color.GRAY);
     }
 
     /**
@@ -272,15 +361,17 @@ public class AddCredentialGUI {
     private static void overwriteButton(String location) {
         String selected = (String) userEmailList.getSelectedItem();
         if (selected == null) {
-            error.setText("No credentials available");
+            successOrError.setForeground(Color.RED);
+            successOrError.setText("No credentials available");
             return;
         } else if(selected.equals("Select Username/Email...")) {
-            error.setText("Please select a valid location");
+            successOrError.setForeground(Color.RED);
+            successOrError.setText("Please select a valid location");
             return;
         }
         VaultManager.modifyLogin(location, passwordField.getText(), selected, user_emailField.getText());
         clearFields();
-        success.setText("Successfully Overwritten!");
         frame.dispose();
+        Initialize("Successfully Overwritten!", Color.GREEN);
     }
 }

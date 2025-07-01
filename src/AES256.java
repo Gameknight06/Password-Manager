@@ -31,7 +31,7 @@ public class AES256 {
 
             return Base64.getEncoder().encodeToString(finalCiphertext);
         } catch (Exception e) {
-            System.out.println("Error while encrypting: " + e.toString());
+            System.out.println("Error while encrypting: " + e);
             return null;
         }
     }
@@ -60,7 +60,7 @@ public class AES256 {
             byte[] original = cipher.doFinal(ciphertext);
             return new String(original, StandardCharsets.UTF_8);
         } catch (Exception e) {
-            System.out.println("Error while decrypting (may be due to incorrect password): " + e.toString());
+            System.out.println("Error while decrypting (may be due to incorrect password): " + e);
             return null;
         }
     }

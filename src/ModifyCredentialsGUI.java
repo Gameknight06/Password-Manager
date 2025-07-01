@@ -1,4 +1,5 @@
 import javax.swing.*;
+import java.awt.*;
 
 public class ModifyCredentialsGUI {
 
@@ -11,30 +12,72 @@ public class ModifyCredentialsGUI {
      * Initializes the Modify Credentials GUI.
      * Sets up the frame, panel, and components for modifying credentials.
      */
-    public static void Initialize() {
+    public static void Initialize(String message, Color color) {
 
         frame = GUIUtils.createAndConfigureFrame("Modify Credentials",700, 500);
         JPanel panel = (JPanel) frame.getContentPane().getComponent(0);
 
-        int fieldWidth = 300;
-        int fieldHeight = 50;
+        int boxWidth = 250;
+        int boxHeight = 50;
         int buttonWidth = 150;
         int buttonHeight = 50;
-        int centerX = (frame.getWidth() - fieldWidth) / 2;
+        int labelWidth = 300;
+        int labelHeight = 50;
 
-        successOrError = GUIUtils.createMessageLabel(panel, centerX + 20, 70, 300, 60); // Label for success and error messages
+        successOrError = new JLabel(message, SwingConstants.CENTER);
+        successOrError.setForeground(color);
 
         credentialList = new JComboBox<>();
-        credentialList.setBounds(centerX - 50, 140, fieldWidth, fieldHeight);
         GUIUtils.refreshLocations(credentialList); // Refresh the list of locations
-        panel.add(credentialList);
 
         JButton editButton = new JButton("Edit");
-        editButton.setBounds(centerX + 300, 140, buttonWidth, buttonHeight);
         editButton.addActionListener(e -> editButton()); // Call the method to handle editing
-        panel.add(editButton);
+        JButton menuButton = GUIUtils.addMenuButton(frame);
 
-        GUIUtils.addMenuButton(frame, panel, 10, 10, buttonWidth, buttonHeight);
+
+        successOrError.setPreferredSize(new java.awt.Dimension(labelWidth, labelHeight));
+        credentialList.setPreferredSize(new java.awt.Dimension(boxWidth, boxHeight));
+        editButton.setPreferredSize(new java.awt.Dimension(buttonWidth, buttonHeight));
+        menuButton.setPreferredSize(new java.awt.Dimension(buttonWidth, buttonHeight));
+
+        GroupLayout layout = (GroupLayout) panel.getLayout();
+
+        layout.setHorizontalGroup(
+                layout.createParallelGroup(GroupLayout.Alignment.CENTER)
+                        .addGroup(layout.createSequentialGroup()
+                                .addComponent(menuButton, buttonWidth, buttonWidth, buttonWidth)
+                                .addGap(0, 0, Short.MAX_VALUE)
+                        )
+                        .addGroup(layout.createSequentialGroup()
+                                .addGap(0, 0, Short.MAX_VALUE)
+                                .addComponent(successOrError, labelWidth, labelWidth, labelWidth)
+                                .addGap(0, 0, Short.MAX_VALUE)
+                        )
+                        .addGroup(layout.createSequentialGroup()
+                                .addGap(0, 0, Short.MAX_VALUE)
+                                .addComponent(credentialList, boxWidth, boxWidth, boxWidth)
+                                .addGap(20)
+                                .addComponent(editButton, buttonWidth, buttonWidth, buttonWidth)
+                                .addGap(0, 0, Short.MAX_VALUE)
+                        )
+
+        );
+
+        layout.setVerticalGroup(
+                layout.createSequentialGroup()
+                        .addGap(10)
+                        .addComponent(menuButton, buttonHeight, buttonHeight, buttonHeight)
+                        .addGap(20)
+                        .addGap(0, 0, Short.MAX_VALUE)
+                        .addComponent(successOrError, labelHeight, labelHeight, labelHeight)
+                        .addGap(15)
+                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.CENTER)
+                            .addComponent(credentialList, boxHeight, boxHeight, boxHeight)
+                            .addComponent(editButton, buttonHeight, buttonHeight, buttonHeight)
+                        )
+                        .addGap(0, 0, Short.MAX_VALUE)
+                        .addGap(200)
+        );
 
         frame.setVisible(true);
     }
@@ -46,29 +89,27 @@ public class ModifyCredentialsGUI {
      * and provides options to edit the selected credentials or go back to the modify credentials GUI.
      */
     private static void duplicateLocation(String location) {
-        JFrame frame = GUIUtils.createAndConfigureFrame("Duplicate Location",400, 300);
+        JFrame frame = GUIUtils.createAndConfigureFrame("Duplicate Location",500, 400);
         JPanel panel = (JPanel) frame.getContentPane().getComponent(0); // Get the panel from the frame
 
-        int fieldWidth = 200;
-        int fieldHeight = 50;
+        int boxWidth = 250;
+        int boxHeight = 50;
         int buttonWidth = 150;
-        int buttonHeight = 40;
-        int centerX = (frame.getWidth() - buttonWidth) / 2;
+        int buttonHeight = 50;
+        int backButtonWidth = 110;
+        int backButtonHeight = 40;
+        int labelWidth = 300;
+        int labelHeight = 50;
 
         JLabel messageLabel = new JLabel("There is more than one entry for " + location);
-        messageLabel.setBounds(0, 0, 360, 50);
-        messageLabel.setHorizontalAlignment(SwingConstants.CENTER);
-        panel.add(messageLabel);
-
-        successOrError = GUIUtils.createMessageLabel(panel, centerX - 80, 20, 300, 60); // Label for success and error messages
-
+        successOrError = new JLabel();
         userEmailList = new JComboBox<>();
-        userEmailList.setBounds(centerX - 110, 70, fieldWidth, fieldHeight);
-        GUIUtils.refreshUsernames(userEmailList, location); // Refresh usernames based on the selected location
-        panel.add(userEmailList);
-
         JButton editButton = new JButton("Edit");
-        editButton.setBounds(centerX + 100, 70, buttonWidth, buttonHeight);
+        JButton backButton = new JButton("Back");
+
+        GUIUtils.refreshUsernames(userEmailList, location); // Refresh usernames based on the selected location
+        successOrError.setForeground(Color.RED);
+
         editButton.addActionListener(e -> {
             String selected = (String) userEmailList.getSelectedItem();
             if (selected == null) {
@@ -81,28 +122,67 @@ public class ModifyCredentialsGUI {
             frame.dispose();
             ModifyCredentialsSingleGUI.Initialize(location, selected, successOrError);
         });
-        panel.add(editButton);
 
-        JButton backButton = new JButton("Back");
-        backButton.setBounds(centerX + 100, 140, buttonWidth, buttonHeight);
         backButton.addActionListener(e -> {
             frame.dispose();
-            Initialize();
+            Initialize("Select credentials to modify:", Color.WHITE);
         });
-        panel.add(backButton);
+
+        messageLabel.setPreferredSize(new java.awt.Dimension(labelWidth, labelHeight));
+        successOrError.setPreferredSize(new java.awt.Dimension(labelWidth, labelHeight));
+        userEmailList.setPreferredSize(new java.awt.Dimension(boxWidth, boxHeight));
+        editButton.setPreferredSize(new java.awt.Dimension(buttonWidth, buttonHeight));
+        backButton.setPreferredSize(new java.awt.Dimension(backButtonWidth, backButtonHeight));
+
+        GroupLayout layout = (GroupLayout) panel.getLayout();
+
+        layout.setHorizontalGroup(
+                layout.createParallelGroup(GroupLayout.Alignment.CENTER)
+                        .addGroup(layout.createSequentialGroup()
+                                .addComponent(backButton, backButtonWidth, backButtonWidth, backButtonWidth)
+                                .addGap(0, 0, Short.MAX_VALUE)
+                        )
+                        .addComponent(messageLabel)
+                        .addComponent(successOrError)
+                        .addGroup(layout.createSequentialGroup()
+                                .addGap(0, 0, Short.MAX_VALUE) // Push to center
+                                .addComponent(userEmailList, boxWidth, boxWidth, boxWidth)
+                                .addGap(15) // Space between combo box and buttons
+                                .addGroup(layout.createParallelGroup(GroupLayout.Alignment.CENTER)
+                                        .addComponent(editButton, buttonWidth, buttonWidth, buttonWidth)
+                                )
+                                .addGap(0, 0, Short.MAX_VALUE) // Push to center
+                        )
+        );
+
+        layout.setVerticalGroup(
+                layout.createSequentialGroup()
+                        .addComponent(backButton, backButtonHeight, backButtonHeight, backButtonHeight)
+                        .addGap(45)
+                        .addComponent(messageLabel)
+                        .addGap(20)
+                        .addComponent(successOrError)
+                        .addGap(5)
+                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.CENTER)
+                                .addComponent(userEmailList, boxHeight, boxHeight, boxHeight)
+                                .addComponent(editButton, buttonHeight, buttonHeight, buttonHeight)
+                        )
+                        .addGap(0, 0, Short.MAX_VALUE)
+        );
 
         frame.setVisible(true);
     }
 
     /**
-     * Handles the action of editing credentials for a single location.
-     * It checks for duplicates and either opens the single modification GUI or opens the duplicate location GUI.
+     * Handles the action when the "Edit" button is clicked.
+     * It determines if there are duplicate credentials for the selected location and navigates to the appropriate GUI.
      */
     private static void editButton() {
         String selected = (String) credentialList.getSelectedItem();
         String username = VaultManager.findUsername(selected);
         assert selected != null;
         if(selected.equals("Select Location...")) { // Check for default selection
+            successOrError.setForeground(Color.RED);
             successOrError.setText("Please select a valid location");
             return;
         }

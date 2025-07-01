@@ -16,7 +16,12 @@ public class GUIUtils {
         frame.setSize(width, height);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setLocationRelativeTo(null);
-        panel.setLayout(null);
+
+        GroupLayout layout = new GroupLayout(panel);
+        panel.setLayout(layout);
+        layout.setAutoCreateGaps(true);
+        layout.setAutoCreateContainerGaps(true);
+
         panel.setFocusable(true);
         SwingUtilities.invokeLater(panel::requestFocusInWindow);
         frame.add(panel);
@@ -82,25 +87,13 @@ public class GUIUtils {
      * Adds a "Back to Menu" button to the specified panel at the given coordinates.
      * When clicked, it disposes of the current frame and initializes the MainMenuGUI.
      */
-    public static void addMenuButton(JFrame frame, JPanel panel, int x, int y, int width, int height) {
+    public static JButton addMenuButton(JFrame frame) {
         JButton menuButton = new JButton("Back to Menu");
         menuButton.putClientProperty("JButton.buttonType", "square");
-        menuButton.setBounds(x, y, width, height);
         menuButton.addActionListener(e -> {
             frame.dispose();
             MainMenuGUI.Initialize();
         });
-        panel.add(menuButton);
-    }
-
-    /**
-     * Creates a JLabel for displaying messages (success or error) and adds it to the specified panel.
-     * Sets the bounds of the label based on the provided parameters.
-     */
-    public static JLabel createMessageLabel(JPanel panel, int x, int y, int width, int height) {
-        JLabel label = new JLabel();
-        label.setBounds(x, y, width, height);
-        panel.add(label);
-        return label;
+        return menuButton;
     }
 }
